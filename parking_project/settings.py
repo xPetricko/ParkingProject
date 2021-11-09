@@ -29,7 +29,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG",default=0)
 
 ALLOWED_HOSTS = ['*',env("HOST_IP",cast="string",default="0.0.0.0")]
-print(env("HOST_IP",cast="string",default="0.0.0.0"))
+
 
 # Application definition
 
@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'parking_project.api'
 ]
 
 MIDDLEWARE = [
