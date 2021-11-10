@@ -1,9 +1,9 @@
 from django.db import models
-from parking_project.api.Models.ParkingLot import ParkingLot
+from Models.ParkingLot import ParkingLot
 
 class LotOccupationHistory(models.Model):
      
-    parkingLot = models.ForeignKey(ParkingLot)
+    parkingLot = models.ForeignKey(ParkingLot,on_delete=models.PROTECT)
     date = models.DateField()
     occupied = models.BooleanField()
      

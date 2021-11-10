@@ -7,13 +7,12 @@ from rest_framework import status
 from .serializers import ParkingLotSerializer
 from .Models.ParkingLot import ParkingLot
 
-from .utils import profile
+
 
 # Create your views here.
 
 class ParkingLotViews(APIView):
     
-    @profile
     def get(self, request):
         serializer = ParkingLotSerializer(ParkingLot.objects.all(), many=True)
         data = serializer.data
