@@ -1,11 +1,14 @@
 from django.db import models
-from Models.ParkingLot import ParkingLot
+
+from .parkingLot import ParkingLot
+
 
 class NetModel(models.Model):
     path=models.CharField(max_length=250)
     type = (
         "object_detection", "clasification"
     ) 
+    
     
     parkingLot = models.ForeignKey(ParkingLot,on_delete=models.PROTECT)
     trained = models.BooleanField()

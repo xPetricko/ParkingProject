@@ -1,5 +1,7 @@
 from django.db import models
-from Models.ParkingLot import ParkingLot
+
+from .parkingLot import ParkingLot
+
 
 class LotOccupationHistory(models.Model):
      

@@ -1,5 +1,8 @@
 from django.db import models
-from Models.ParkingSpace import ParkingSpace
+
+from .parkingSpace import ParkingSpace
+
+
 
 class SpaceOccupationHistory(models.Model):
      

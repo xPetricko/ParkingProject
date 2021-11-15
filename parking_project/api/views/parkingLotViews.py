@@ -4,10 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import ParkingLotSerializer
-from .Models.ParkingLot import ParkingLot
 
-
+from ..models import ParkingLot
+from ..serializers import ParkingLotSerializer
 
 # Create your views here.
 
