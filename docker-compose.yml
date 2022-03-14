@@ -14,6 +14,11 @@ services:
 
   web:
     build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
     env_file: .env
     command: ./web_start.sh
     volumes:
