@@ -2,3 +2,5 @@ Django>=3.0,<4.0
 psycopg2-binary>=2.8
 django-environ
 djangorestframework
+numpy
+torch
