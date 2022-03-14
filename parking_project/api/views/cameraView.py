@@ -5,24 +5,22 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-from ..models import ParkingLot
-from ..serializers import ParkingLotSerializer
+from ..models import Camera
+from ..serializers import CameraSerializer
 
-# Create your views here.
-
-class ParkingLotViews(APIView):
+class CameraView(APIView):
     
     def get(self, request):
-        serializer = ParkingLotSerializer(ParkingLot.objects.all(), many=True)
+        serializer = CameraSerializer(Camera.objects.all(), many=True)
         data = serializer.data
         if data:
-            return Response({"status": "Parking lots", "data": serializer.data}, status=status.HTTP_200_OK)
+            return Response({"status": "Cameras", "data": serializer.data}, status=status.HTTP_200_OK)
         else:
-            return Response({"status": "No parking lot"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": "No camera."}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def post(self, request):
-        serializer = ParkingLotSerializer(data=request.data)
+        serializer = CameraSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save()
             return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
