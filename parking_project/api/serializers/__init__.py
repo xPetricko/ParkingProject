@@ -5,3 +5,4 @@ from .lotOccupationHistorySerializer import LotOccupationHistorySerializer
 from .netModelSerializer import NetModelSerializer
 from .parkingSpaceSerializer import ParkingSpaceSerializer
 from .spaceOccupationHistorySerializer import SpaceOccupationHistorySerializer
+from .parkingLotOccupacySerializer import ParkingLotOccupacySerializer

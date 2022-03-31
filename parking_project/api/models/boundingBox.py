@@ -10,5 +10,5 @@ class BoundingBox(models.Model):
     parking_space = models.ForeignKey(ParkingSpace, on_delete=models.CASCADE)
     x_pos = models.PositiveIntegerField()
     y_pos = models.PositiveIntegerField()
-    x_width = models.PositiveIntegerField()
-    y_width = models.PositiveIntegerField()
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()

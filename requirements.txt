@@ -4,3 +4,6 @@ django-environ
 djangorestframework
 numpy
 torch
+torchvision
+pandas
+scikit_image

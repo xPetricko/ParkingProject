@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'parking_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'parkingproject',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',
@@ -141,4 +141,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Torch settings
 print("Detecting Torch device availability.\n")
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+DEVICE_CPU = torch.device('cpu')
 print("Torch device set to: ",DEVICE)
+print("Torch device_cpu set to: ",DEVICE_CPU)
+
+APPEND_SLASH=False
