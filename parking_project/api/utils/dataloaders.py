@@ -7,7 +7,7 @@ from skimage import io
 import numpy as np
 import math
 
-class PatchesDataLoader(Dataset):
+class PatchesFromCsvDataLoader(Dataset):
     def __init__(self, csv_file, root_dir, transform=None, filter=None, filter_exclude = False, batch_size = 1):
         self.data = pd.read_csv(root_dir+csv_file, sep=' ',names=['path','label'], header=None)
         if filter:

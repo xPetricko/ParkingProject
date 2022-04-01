@@ -4,6 +4,8 @@
 echo "Create local data folder"
 mkdir -p ./data/parkinglot
 
+echo "Installing dependencies"
+pip3 install -r ./requirements.txt
 
 # Collect static files
 echo "Collect static files"

@@ -1,1 +1,1 @@
-from .dataloaders import PatchesDataLoader
+from .dataloaders import PatchesFromCsvDataLoader
