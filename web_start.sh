@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Create local data folder
-echo "Create local data folder"
-mkdir -p ./data/parkinglot
+echo "Create local data folder for netmodel"
+mkdir -p ./data/netmodel
+
 
 echo "Installing dependencies"
 pip3 install -r ./requirements.txt

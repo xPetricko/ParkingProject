@@ -24,10 +24,10 @@ class NetModelOneView(APIView):
 
       def get(self, request, netmodel_id=None):
 
-        netmodel = NetModel.objects.get(id=netmodel_id)
-        netmodel.loadNetModel()
+        net_model = NetModel.objects.get(id=netmodel_id)
+        net_model.loadNetModel()
 
-        serializer = NetModelSerializer(netmodel)
+        serializer = NetModelSerializer(net_model)
         data = serializer.data
 
         if data:

@@ -1,3 +1,4 @@
+from fileinput import filename
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -10,17 +11,20 @@ import shutil
 
 class ParkingLotFilesUploadView(APIView):
     parser_classes = [FormParser, MultiPartParser]
-    def post(self, request,format=None,parking_lot_id=None):
+    def post(self, request,format=None,net_model_id=None):
         file = request.data['data']
-
+        dir_path = './data/netmodel/model'+str(net_model_id)+'/'
         with ZipFile(file, 'r') as zipObj:
+            default_folder = zipObj.namelist()[0]
             # Extract all the contents of zip file in current directory
-            zipObj.extractall(path='./data/parkinglot/'+str(parking_lot_id)+'/')
+            zipObj.extractall(path=dir_path)
         
-        if os.path.exists('./data/parkinglot/'+str(parking_lot_id)+'/__MACOSX'):
-            shutil.rmtree('./data/parkinglot/'+str(parking_lot_id)+'/__MACOSX')
+        if os.path.exists(dir_path+'__MACOSX'):
+            shutil.rmtree(dir_path+'__MACOSX')
+
+        os.rename(dir_path+default_folder, dir_path+"data/")
 
         
 
-        return Response({"status": "success", "data": "SUUPER"}, status=status.HTTP_200_OK)
+        return Response({"status": "success", "data": "File uploaded."}, status=status.HTTP_200_OK)
 

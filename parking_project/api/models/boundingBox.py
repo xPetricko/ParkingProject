@@ -12,3 +12,12 @@ class BoundingBox(models.Model):
     y_pos = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
     height = models.PositiveIntegerField()
+
+    def getArea(self,size_coef=1):
+        return self.height*self.width*(size_coef**2)
+
+    def getCoordinates(self,size_coef=1):
+        if size_coef!= 1:
+            return (self.x_pos*size_coef, self.y_pos*size_coef,(self.x_pos+self.width)*size_coef, (self.y_pos+self.height)*size_coef)
+        else:
+            return (self.x_pos, self.y_pos, self.x_pos+self.width, self.y_pos+self.height)

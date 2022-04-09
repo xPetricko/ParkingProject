@@ -1,12 +1,9 @@
 
-from cmath import log
-from statistics import mode
 
+from django.db.models.signals import post_save
 from django.db import models
 
 from parking_project.settings import DEVICE, DEVICE_CPU
-
-from .parkingLot import ParkingLot
 
 import torch
 import torch.nn as nn
@@ -18,18 +15,19 @@ from torchvision import transforms
 
 import numpy as np
 
-
+from datetime import datetime
 import os
 
-from parking_project.api.utils import PatchesFromCsvDataLoader
+from parking_project.api.utils.dataloaders import PatchesFromCsvDataLoader, ObjectDetectionDataLoader
 
-last_loaded_netmodel = None
+from ..utils.torchUtils import move_to
+
+last_loaded_net_model = None
 
 
 class NetModel(models.Model):
     path=models.CharField(max_length=250,null=True)
-    type = models.CharField(max_length=20,choices=[("object_detection","object_detection"),( "clasification", "clasification")])
-    parking_lot = models.ForeignKey(ParkingLot,on_delete=models.PROTECT)
+    type = models.CharField(max_length=20,choices=[("object_detection","object_detection"),( "classification", "classification")])
     trained = models.BooleanField(default=False)
     trained_date = models.DateField(null=True)
     accuracy = models.FloatField(default=0.0)
@@ -40,12 +38,12 @@ class NetModel(models.Model):
         self.model = None
 
     def loadNetModel(self):
-        global last_loaded_netmodel
-        if last_loaded_netmodel and last_loaded_netmodel.id == self.id:
-            self.model = last_loaded_netmodel.model
+        global last_loaded_net_model
+        if last_loaded_net_model and last_loaded_net_model.id == self.id:
+            self.model = last_loaded_net_model.model
         else:
             self.model = torch.load(self.path)
-            last_loaded_netmodel = self
+            last_loaded_net_model = self
 
     def createNewNetModel(self):
         if self.model or self.path:
@@ -53,16 +51,19 @@ class NetModel(models.Model):
 
         if self.type == "object_detection":
             self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained_backbone=True,num_classes=2)
-        if self.type == "clasification":
+        elif self.type == "classification":
             self.model = torch.hub.load('pytorch/vision:v0.10.0', 'alexnet', pretrained=True)
             self.model.classifier[4] = nn.Linear(4096,1024)
             self.model.classifier[6] = nn.Linear(1024,2)
+        else:
+            return False
         self.saveModel()
 
     def saveModel(self):
         self.model.to(DEVICE_CPU)
         if not self.path:
-            self.path = './data/parkinglot/'+str(self.parking_lot.id)+'/netmodels/model'+str(self.id)
+            self.path = './data/netmodel/model'+str(self.id)+"/model_parameters"
+            self.trained=True
         torch.save(self.model, self.path)
         self.save()
 
@@ -71,15 +72,24 @@ class NetModel(models.Model):
 
     #The images have to be loaded in to a range of [0, 1] and then normalized using mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225].
     
-    def train(self,train_csv_file,filter=None,filter_exclude=False, batch_size=1):
-
+    def train(self,train_file,filter=None,filter_exclude=False, batch_size=1):
+        
+        root_dir='./data/netmodel/model'+str(self.id)+'/data/'
+        
         if self.type == "object_detection":
-            pass
+            
+            dataloader = ObjectDetectionDataLoader(
+                labels_file_path=train_file,
+                root_dir=root_dir,
+                batch_size=batch_size
+            )
+
+            return self.train_object_detection(dataloader)
+            
 
         if self.type == "clasification":
-            root_dir='./data/parkinglot/'+str(self.parking_lot.id)+'/data/PATCHES/'
             dataloader = PatchesFromCsvDataLoader(
-                csv_file=train_csv_file,
+                csv_file=train_file,
                 root_dir=root_dir,
                 filter=filter,
                 filter_exclude=filter_exclude,
@@ -97,7 +107,7 @@ class NetModel(models.Model):
         #Optimizer(SGD)
         optimizer = optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
 
-        for epoch in range(1):  # loop over the dataset multiple times
+        for epoch in range(10):  # loop over the dataset multiple times
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
             # get the inputs; data is a list of [inputs, labels]
@@ -114,8 +124,8 @@ class NetModel(models.Model):
 
                 # print statistics
                 running_loss += loss.item()
-                if i % 2:    # print evforery 2000 mini-batches
-                    log = log + '[%d, %5d] loss: %.4f\n' % (epoch + 1, i + 1, running_loss / 2000)
+                if i % 500 == 0:    # print evforery 2000 mini-batches
+                    log = log + '[%d, %5d] loss: %.4f\n' % (epoch + 1, i + 1, running_loss/500)
                     running_loss = 0.0
         log = log + 'Training finished'
     
@@ -123,14 +133,25 @@ class NetModel(models.Model):
 
 
     def train_object_detection(self,trainloader):
-        pass
+        self.model.to(DEVICE)
+        self.model.double()
+        train_log = "Start training: \n"
+        for epoch in range(5):  # loop over the dataset multiple times
+
+            for i, data in enumerate(trainloader, 0):
+                images,targets = data[0].to(DEVICE), move_to(data[1],DEVICE) 
+            
+                output = self.model(images, targets)
+                train_log = train_log + '[%d, %5d] classification_loss: %.4f detection_loss: %.4f\n' % (epoch + 1, i + 1, output['loss_classifier'], output['loss_objectness'])
+
+        return train_log
 
     def test(self,test_csv_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
         if self.type == "object_detection":
             pass
 
         if self.type == "clasification":
-            root_dir='./data/parkinglot/'+str(self.parking_lot.id)+'/data/PATCHES/'
+            root_dir='./data/netmodel/'+str(self.id)+'/data/'
             test_data_loader = PatchesFromCsvDataLoader(
                 csv_file=test_csv_file,
                 root_dir=root_dir,
@@ -165,7 +186,17 @@ class NetModel(models.Model):
 
         return log
 
-    def detectOccupation(self,patches):
+
+    def detectOccupancyObjectDetection(self,image):
+
+        self.model.to(DEVICE)
+        image = torch.from_numpy(np.stack(image)).to(DEVICE)
+
+        prediction = self.model([image])
+
+        return prediction[0]
+
+    def detectOccupancyClassification(self,patches):
         
         transform = transforms.Compose([
                                 transforms.ToPILImage(),
@@ -199,3 +230,16 @@ class NetModel(models.Model):
 
         return np.argmax(result, axis=1)
 
+
+
+
+
+    @classmethod
+    def createNetModelDir(cls, sender, instance, created, *args, **kwargs):
+        if not created:
+            return
+        os.makedirs('./data/netmodel/model'+str(instance.id)+'/data', exist_ok=True)
+            
+
+
+post_save.connect(NetModel.createNetModelDir, sender=NetModel)
