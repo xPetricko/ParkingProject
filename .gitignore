@@ -121,3 +121,4 @@ dmypy.json
 
 .vscode/
 data/
+static/
