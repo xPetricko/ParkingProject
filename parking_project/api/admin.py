@@ -6,7 +6,8 @@ import os
 from .models import *
 # Register your models here.
 
-os.getcwd()
+print("THIS IS THE CWD")
+print(os.getcwd())
 
 admin.site.register(Camera)
 admin.site.register(LotOccupancyHistory)
