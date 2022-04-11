@@ -3,7 +3,7 @@ from django.db import models
 
 import os
 
-from .parking_project.api.models import *
+from parking_project.api.models.camera import Camera
 # Register your models here.
 
 
