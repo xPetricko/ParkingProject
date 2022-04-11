@@ -3,11 +3,10 @@ from django.db import models
 
 import os
 
-from .models import *
+from .parking_project.api.models import *
 # Register your models here.
 
-print("THIS IS THE CWD")
-print(os.getcwd())
+
 
 admin.site.register(Camera)
 admin.site.register(LotOccupancyHistory)
