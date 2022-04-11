@@ -1,9 +1,12 @@
 from django.contrib import admin
 from django.db import models
 
+import os
 
-from parking_project.api.models import *
+from .models import *
 # Register your models here.
+
+os.getcwd()
 
 admin.site.register(Camera)
 admin.site.register(LotOccupancyHistory)
