@@ -32,7 +32,7 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
     ports:
       - 3000:3000
-    volumes:
+    volumes: 
       - ./graphana:/etc/grafana/provisioning
     depends_on:
       - db
