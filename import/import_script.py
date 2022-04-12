@@ -1,19 +1,37 @@
-import json
-from os import fdopen
-import requests
 import csv
+import json
+from getpass import getpass
+from os import fdopen
 
+import requests
+from requests.auth import HTTPBasicAuth
 
 X_RATIO = 1000/2592
 Y_RATIO = 750/1944
 
 
+
+server_ip = input("Insert server IP: ")
+
+login = input("Login: ")
+password = getpass()
+auth = HTTPBasicAuth(login, password)
+
+del login,password
+
+
+port = '8000' #input('Enter server API port: ')
+server_url = 'http://'+server_ip+':'+port+'/api/'
+
+print('Getting acces token')
+
+res = requests.post(url=server_url+'parkinglot', auth=auth)
+
+
+
 print('Starting script CNR Park Dataset Import')
 print('-'*20)
-ip = 'localhost' #input('Enter server API ip: ')
-port = '8000' #input('Enter server API port: ')
 
-server_url = 'http://'+ip+':'+port+'/api/'
 
 print('Creating Parking Lot')
 headers = {'Content-type':'application/json'}
@@ -21,7 +39,7 @@ data = {
     'address' : 'Test Address',
     'name' : 'CNR ParkLot',
 }
-res = requests.post(url=server_url+'parkinglot/',headers=headers,json=data)
+res = requests.post(url=server_url+'parkinglot',headers=headers,json=data, auth=auth)
 
 if res.status_code==200:
     print('Parking Lot Created.')
@@ -33,18 +51,19 @@ parking_lot_data = res.json()['data']
 
 print('Creating Cameras')
 data = [ {
-    'parkingLot': parking_lot_data['id'],
+    'parking_lot': parking_lot_data['id'],
     'camera_number': i,
     'resolution_x': 1000,
     'resolution_y':750
     } for i in range(1,10)
     ]
 
-res = requests.post(url=server_url+'camera/',headers=headers,json=data)
+res = requests.post(url=server_url+'camera',headers=headers,json=data, auth=auth)
 if res.status_code==200:
     print('Cameras created.')
 else:
     print('Error. Something went wrong.')
+    print(res.text)
     exit()
 
 camera_data = {row['camera_number']:row for row in res.json()['data']}
@@ -82,12 +101,13 @@ data = [{
     } for parking_space_id in parking_spaces_ids
     ]
 
-res = requests.post(url=server_url+'parkingspace/',headers=headers,json=data)
+res = requests.post(url=server_url+'parkingspace',headers=headers,json=data, auth=auth)
 
 if res.status_code==200:
     print('Parking Spaces created.')
 else:
     print('Error. Something went wrong.')
+    print(res.text)
     exit() 
 
 print('Creating bounding boxes.')
@@ -105,12 +125,13 @@ data = [
     } for row in boundingbox_data
 ]
 
-res = requests.post(url=server_url+'boundingbox/',headers=headers,json=data)
+res = requests.post(url=server_url+'boundingbox',headers=headers,json=data, auth=auth)
 
 if res.status_code==200:
     print('Bounding boxes created.')
 else:
     print('Error. Something went wrong.')
+    print(res.text)
     exit 
 
 print('Import completed!')
