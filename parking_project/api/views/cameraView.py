@@ -1,15 +1,19 @@
 from django.shortcuts import render
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication,
+                                           TokenAuthentication)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models import Camera
 from ..serializers import CameraSerializer
 
+
 class CameraView(APIView):
-    
+    authentication_classes = [BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         serializer = CameraSerializer(Camera.objects.all(), many=True)
         data = serializer.data

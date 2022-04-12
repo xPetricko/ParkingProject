@@ -1,16 +1,22 @@
 from ipaddress import NetmaskValueError
+
 from django.shortcuts import render
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication,
+                                           TokenAuthentication)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models import NetModel
 from ..serializers import NetModelSerializer
 
+
 class NetModelView(APIView):
-    
+    authentication_classes = [BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = NetModelSerializer(data=request.data)
         if serializer.is_valid():
@@ -21,8 +27,11 @@ class NetModelView(APIView):
             return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 class NetModelOneView(APIView):
+    authentication_classes = [BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
-      def get(self, request, netmodel_id=None):
+    
+    def get(self, request, netmodel_id=None):
 
         net_model = NetModel.objects.get(id=netmodel_id)
         net_model.loadNetModel()

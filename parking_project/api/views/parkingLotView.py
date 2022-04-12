@@ -1,17 +1,23 @@
 
 from django.shortcuts import get_object_or_404
 from parking_project.api.models import parkingLot
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication,
+                                           TokenAuthentication)
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models import ParkingLot
-from ..serializers import ParkingLotSerializer, ParkingLotOccupacySerializer, CameraSerializer
-from rest_framework.parsers import MultiPartParser,FormParser
+from ..serializers import (CameraSerializer, ParkingLotOccupacySerializer,
+                           ParkingLotSerializer)
+
 
 class ParkingLotView(APIView):
+    authentication_classes = [BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         serializer = ParkingLotSerializer(ParkingLot.objects.all(), many=True)

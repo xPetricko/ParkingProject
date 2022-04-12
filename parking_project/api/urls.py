@@ -5,6 +5,8 @@ from django.urls import path
 from .views import *
 from .views import parkingProjectApiFunctions as ParkingProjectApiFunctions
 
+from .views.authenticationView import AuthenticationView
+
 urlpatterns = [
     path('parkinglot', ParkingLotView.as_view()),
     path('camera', CameraView.as_view()),
@@ -15,5 +17,6 @@ urlpatterns = [
     path('netmodel/<int:net_model_id>/upload_data', ParkingLotFilesUploadView.as_view()),
     path('netmodel/<int:net_model_id>/train', ParkingProjectApiFunctions.trainNet),
     path('netmodel/<int:net_model_id>/test/csv', ParkingProjectApiFunctions.testNetCsv),
-    path('parkinglot/<int:parking_lot_id>/detect_occupancy', ParkingProjectApiFunctions.detectOccupancy)
+    path('parkinglot/<int:parking_lot_id>/detect_occupancy', ParkingProjectApiFunctions.detectOccupancy),
+    path('authenticate', AuthenticationView.as_view()),
 ]

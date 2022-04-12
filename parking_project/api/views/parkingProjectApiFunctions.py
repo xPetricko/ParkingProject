@@ -1,29 +1,32 @@
+import datetime
 from email.mime import image
 
-from parking_project.api.models import netModel
-
-from ..models import NetModel, ParkingLot, Camera
-
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import api_view
-
 from django.shortcuts import get_object_or_404
-
-import datetime
-
-from ..utils import loggers
-
-
-from ..serializers import ParkingLotSerializer, CameraSerializer,BoundingBoxSerializer
-from ..handlers import imageHandlers, occupancyDetectionHandlers
+from parking_project.api.models import netModel
+from rest_framework import status
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication,
+                                           TokenAuthentication)
+from rest_framework.decorators import api_view
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import authentication_classes,permission_classes
 
 from skimage import io
 
-from rest_framework.parsers import MultiPartParser,FormParser
+from ..handlers import imageHandlers, occupancyDetectionHandlers
+from ..models import Camera, NetModel, ParkingLot
+from ..serializers import (BoundingBoxSerializer, CameraSerializer,
+                           ParkingLotSerializer)
+from ..utils import loggers
+
 parser_classes = [FormParser, MultiPartParser]
 
+
 @api_view(['POST'])
+@authentication_classes([BasicAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def trainNet(request, net_model_id=None):
 
     net_model = NetModel.objects.get(id=net_model_id)
@@ -76,6 +79,8 @@ def trainNet(request, net_model_id=None):
 
 
 @api_view(['POST'])
+@authentication_classes([BasicAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def testNetCsv(request, net_model_id=None):
 
     try:
@@ -105,6 +110,8 @@ def testNetCsv(request, net_model_id=None):
 
 
 @api_view(['POST'])
+@authentication_classes([BasicAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def detectOccupancy(request, parking_lot_id=None):
 
 
