@@ -1,1 +1,0 @@
-DELETE * FROM api_netmodel
