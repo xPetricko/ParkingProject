@@ -1,0 +1,48 @@
+version: "3.9"
+
+
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_DB=parkingproject
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    env_file: .env
+    command: ./web_start.sh
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  grafana:
+    image: grafana/grafana:8.1.5
+    environment: 
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    ports:
+      - 3000:3000
+    volumes: 
+      - ./graphana:/etc/grafana/provisioning
+    depends_on:
+      - db
+      - web
+
+
+
+  
