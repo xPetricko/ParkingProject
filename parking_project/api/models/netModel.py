@@ -144,6 +144,7 @@ class NetModel(models.Model):
                 output = self.model(images, targets)
                 train_log = train_log + '[%d, %5d] classification_loss: %.4f detection_loss: %.4f\n' % (epoch + 1, i + 1, output['loss_classifier'], output['loss_objectness'])
 
+                images.to(DEVICE_CPU),move_to(targets,DEVICE_CPU)
         return train_log
 
     def test(self,test_csv_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
