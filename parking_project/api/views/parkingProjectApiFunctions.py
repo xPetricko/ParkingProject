@@ -87,7 +87,7 @@ def testNetCsv(request, net_model_id=None):
             return Response({"status": "Unable testo for this net model type.", "netmodel_type": netModel.type}, status=status.HTTP_400_BAD_REQUEST)
         net_model.loadNetModel()
 
-        test_csv_file = request.data['test_csv_file']
+        test_file = request.data['test_file']
 
 
         filter = request.data.get('filter') or None
@@ -95,7 +95,7 @@ def testNetCsv(request, net_model_id=None):
         batch_size = int(request.data.get('batch_size') or 1)
 
         test_log = net_model.test(
-            test_csv_file=test_csv_file,
+            test_csv_file=test_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size,
