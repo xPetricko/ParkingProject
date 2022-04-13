@@ -87,7 +87,7 @@ class NetModel(models.Model):
             return self.train_object_detection(dataloader)
             
 
-        if self.type == "clasification":
+        if self.type == "classification":
             dataloader = PatchesFromCsvDataLoader(
                 csv_file=train_file,
                 root_dir=root_dir,
