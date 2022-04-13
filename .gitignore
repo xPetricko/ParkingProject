@@ -118,7 +118,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
-
+/tmp_data/
 .vscode/
 /data/
 static/
