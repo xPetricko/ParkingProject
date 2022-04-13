@@ -95,7 +95,7 @@ def testNetCsv(request, net_model_id=None):
         batch_size = int(request.data.get('batch_size') or 1)
 
         test_log = net_model.test(
-            test_csv_file=test_file,
+            test_file=test_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size,
