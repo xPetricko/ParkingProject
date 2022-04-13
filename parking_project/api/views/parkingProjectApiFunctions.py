@@ -32,15 +32,19 @@ def trainNet(request, net_model_id=None):
     net_model = NetModel.objects.get(id=net_model_id)
     net_model.loadNetModel()
 
+    train_file = request.data['train_file']
+    filter = request.data.get('filter') or None
+    filter_exclude = request.data.get('filter_exclude') or False
+    batch_size = int(request.data.get('batch_size') or 1)
+    save_if_better = request.data.get('save_if_better') or not net_model.trained or False
+
+
+
     if net_model.type == "classification":
-        train_file = request.data['train_file']
         test_file = request.data['test_file']
 
 
-        filter = request.data.get('filter') or None
-        filter_exclude = request.data.get('filter_exclude') or False
-        batch_size = int(request.data.get('batch_size') or 1)
-        save_if_better = request.data.get('save_if_better') or not net_model.trained or False
+      
 
 
         train_log = net_model.train(

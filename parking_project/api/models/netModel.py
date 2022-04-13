@@ -1,26 +1,28 @@
 
 
-from django.db.models.signals import post_save
-from django.db import models
-
-from parking_project.settings import DEVICE, DEVICE_CPU
-
-import torch
-import torch.nn as nn
-import torch.functional as F
-import torch.optim as optim
-
-import torchvision
-from torchvision import transforms
+import os
+from datetime import datetime
+from re import M
+from statistics import mode
 
 import numpy as np
+import torch
+import torch.functional as F
+import torch.nn as nn
+import torch.optim as optim
+import torchvision
+from django.db import models
+from django.db.models.signals import post_save
+from parking_project.api.handlers.netModelCreateHandlers import \
+    get_object_detection_model
+from parking_project.api.utils.dataloaders import (ObjectDetectionDataLoader,
+                                                   PatchesFromCsvDataLoader)
+from parking_project.settings import DEVICE, DEVICE_CPU
+from torchvision import transforms
 
-from datetime import datetime
-import os
+from ..utils import torchUtils as torch_utils
 
-from parking_project.api.utils.dataloaders import PatchesFromCsvDataLoader, ObjectDetectionDataLoader
-
-from ..utils.torchUtils import move_to
+import math
 
 last_loaded_net_model = None
 
@@ -50,7 +52,7 @@ class NetModel(models.Model):
             return None
 
         if self.type == "object_detection":
-            self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained_backbone=True,num_classes=2)
+            self.model = get_object_detection_model(2)
         elif self.type == "classification":
             self.model = torch.hub.load('pytorch/vision:v0.10.0', 'alexnet', pretrained=True)
             self.model.classifier[4] = nn.Linear(4096,1024)
@@ -81,7 +83,7 @@ class NetModel(models.Model):
             dataloader = ObjectDetectionDataLoader(
                 labels_file_path=train_file,
                 root_dir=root_dir,
-                batch_size=batch_size
+                transforms=None
             )
 
             return self.train_object_detection(dataloader)
@@ -135,16 +137,59 @@ class NetModel(models.Model):
     def train_object_detection(self,trainloader):
         self.model.to(DEVICE)
         self.model.double()
+
+        params = [p for p in self.model.parameters() if p.requires_grad]
+        optimizer = torch.optim.SGD(params, lr=0.005,
+                                    momentum=0.9, weight_decay=0.0005)
+        # and a learning rate scheduler
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
+                                                    step_size=3,
+                                                    gamma=0.1)
+
         train_log = "Start training: \n"
+
         for epoch in range(10):  # loop over the dataset multiple times
-
-            for i, data in enumerate(trainloader, 0):
-                images,targets = data[0].to(DEVICE), move_to(data[1],DEVICE) 
             
-                output = self.model(images, targets)
-                train_log = train_log + '[%d, %5d] classification_loss: %.4f detection_loss: %.4f\n' % (epoch + 1, i + 1, output['loss_classifier'], output['loss_objectness'])
+            self.model.train()
+            if epoch == 0:
+                warmup_factor = 1.0 / 1000
+                warmup_iters = min(1000, len(trainloader) - 1)
 
-                images.to(DEVICE_CPU),move_to(targets,DEVICE_CPU)
+                lr_scheduler = torch.optim.lr_scheduler.LinearLR(
+                optimizer, start_factor=warmup_factor, total_iters=warmup_iters
+                )
+            
+
+            for i,(images,targets) in enumerate(trainloader, 0):
+               
+                images = list(img.to(DEVICE).double() for img in images)
+                targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
+            
+                with torch.cuda.amp.autocast(enabled=False):
+                    loss_dict = self.model(images, targets)
+                    losses = sum(loss for loss in loss_dict.values())
+                
+                loss_dict_reduced = torch_utils.reduce_dict(loss_dict)
+                losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+
+                loss_value = losses_reduced.item()
+
+                if not math.isfinite(loss_value):
+                    train_log+= "Loss is infinite, stopping training"
+                    return train_log
+                
+                optimizer.zero_grad()
+
+                losses.backward()
+                optimizer.step()
+
+                if lr_scheduler is not None:
+                    lr_scheduler.step()
+
+                train_log = train_log + '[%d, %5d] Train loss: %.4f\n' % (epoch + 1, i + 1, losses)
+            
+            lr_scheduler.step()
+
         return train_log
 
     def test(self,test_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):

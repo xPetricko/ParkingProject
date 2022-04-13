@@ -1,3 +1,4 @@
+
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
@@ -7,7 +8,7 @@ from skimage import io
 import numpy as np
 import math
 from skimage.util import img_as_float
-
+from PIL import Image
 
 
 from ..utils.xmlparsers import xmlBoundingBoxParser
@@ -23,7 +24,6 @@ class PatchesFromCsvDataLoader(Dataset):
 
         if transform:
             self.transform = self.transform = transforms.Compose([
-                                transforms.ToPILImage(),
                                 transforms.Resize(256),
                                 transforms.CenterCrop(224),
                                 transforms.ToTensor(),
@@ -31,7 +31,6 @@ class PatchesFromCsvDataLoader(Dataset):
                             ]) 
         else:
             self.transform = transforms.Compose([
-                                transforms.ToPILImage(),
                                 transforms.Resize(256),
                                 transforms.CenterCrop(224),
                                 transforms.ToTensor(),
@@ -58,9 +57,9 @@ class PatchesFromCsvDataLoader(Dataset):
         
         for img_path in self.data.path[values_idx]:
 
-            image = io.imread(
+            image = Image.open(
                 os.path.join(self.root_dir,img_path)
-            )
+            ).convert("RGB")
 
             if self.transform:
                 image = self.transform(image)
@@ -76,45 +75,40 @@ class PatchesFromCsvDataLoader(Dataset):
 
 
 class ObjectDetectionDataLoader(Dataset):
-    def __init__(self, labels_file_path, root_dir, batch_size = 1):
+    def __init__(self, labels_file_path, root_dir, transforms):
         self.data = open(root_dir+labels_file_path).read().splitlines()
         self.root_dir = root_dir
-        self.batch_size = int(batch_size)
+
+
+        
+    
+    
+    
     
     def __len__(self):
-        return math.ceil(len(self.data)/self.batch_size)
+        return len(self.data)
     
     def __getitem__(self, idx):
-        if idx < 0 or idx*self.batch_size >= len(self):
+        if idx < 0 or idx >= len(self):
             raise IndexError
 
-        xml_files_paths = self.data[idx*self.batch_size:min((idx+1)*self.batch_size,len(self))]
-        
-        images_arr = []
-        targets = []
-        
+            
+        image_path, bboxes = xmlBoundingBoxParser(self.root_dir+self.data[idx])
+            
+        bboxes = torch.as_tensor(bboxes, dtype=torch.float32)
 
-        for xml_file_path in xml_files_paths:
+        img = Image.open(
+            os.path.join(self.root_dir,image_path)
+        ).convert("RGB")
             
-            image_path, bboxes = xmlBoundingBoxParser(self.root_dir+xml_file_path)
+        target = {}
+        target['boxes'] = torch.as_tensor(bboxes, dtype=torch.float32)
+        target['labels'] = torch.ones((len(bboxes),), dtype=torch.int64)
+        target['area'] = (bboxes[:, 3] - bboxes[:, 1]) * (bboxes[:, 2] - bboxes[:, 0])
             
-
-            image = io.imread(
-                os.path.join(self.root_dir,image_path)
-            )
-            
-            d = {}
-            d['boxes'] = torch.from_numpy(np.stack(bboxes))
-            d['labels'] = torch.ones(len(bboxes),dtype=torch.int64)
-            
-            targets.append(d)
-            
-            images_arr.append(img_as_float(image).transpose(2,1,0))
-            
-
-        images_arr = np.stack(images_arr)
-        images_shape = images_arr.shape
-        
-        images_arr = torch.from_numpy(images_arr.flatten()).reshape(images_shape).double()
-       
-        return images_arr, targets
+        self.transform = transforms.ToTensor()
+        img = self.transform(img)
+        # img, target = self.transform(img), self.transform(target)
+        img = [img]
+        target = [target]
+        return img, target
