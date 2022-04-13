@@ -154,7 +154,7 @@ class NetModel(models.Model):
         if self.type == "classification":
             root_dir='./data/netmodel/model'+str(self.id)+'/data/'
             test_data_loader = PatchesFromCsvDataLoader(
-                csv_file=test_csv_file,
+                csv_file=test_file,
                 root_dir=root_dir,
                 filter=filter,
                 filter_exclude=filter_exclude,
