@@ -44,14 +44,14 @@ def trainNet(request, net_model_id=None):
 
 
         train_log = net_model.train(
-            train_csv_file=train_file,
+            train_file=train_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size
             )
         
         test_log = net_model.test(
-            test_csv_file=test_file,
+            test_file=test_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size,

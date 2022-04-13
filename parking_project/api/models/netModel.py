@@ -147,7 +147,7 @@ class NetModel(models.Model):
                 images.to(DEVICE_CPU),move_to(targets,DEVICE_CPU)
         return train_log
 
-    def test(self,test_csv_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
+    def test(self,test_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
         if self.type == "object_detection":
             pass
 
