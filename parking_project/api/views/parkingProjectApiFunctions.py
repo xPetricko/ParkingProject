@@ -39,7 +39,7 @@ def trainNet(request, net_model_id=None):
 
         filter = request.data.get('filter') or None
         filter_exclude = request.data.get('filter_exclude') or False
-        batch_size = int(request.data.get('batch_size')) or 1
+        batch_size = int(request.data.get('batch_size') or 1)
         save_if_better = request.data.get('save_if_better') or not net_model.trained or False
 
 
@@ -51,7 +51,7 @@ def trainNet(request, net_model_id=None):
             )
         
         test_log = net_model.test(
-            test_csv_file=test_csv_file,
+            test_csv_file=test_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size,
@@ -62,10 +62,8 @@ def trainNet(request, net_model_id=None):
     
     elif net_model.type == "object_detection":
         
-        train_file = request.data['train_file']
-        batch_size = request.data.get('batch_size') or 1
         train_log = net_model.train(
-            train_file= train_xml_file,
+            train_file= train_file,
             batch_size= batch_size
             )
         net_model.saveModel()
@@ -94,7 +92,7 @@ def testNetCsv(request, net_model_id=None):
 
         filter = request.data.get('filter') or None
         filter_exclude = request.data.get('filter_exclude') or False
-        batch_size = int(request.data.get('batch_size')) or 1
+        batch_size = int(request.data.get('batch_size') or 1)
 
         test_log = net_model.test(
             test_csv_file=test_csv_file,
