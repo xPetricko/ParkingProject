@@ -33,23 +33,23 @@ def trainNet(request, net_model_id=None):
     net_model.loadNetModel()
 
     if net_model.type == "classification":
-        train_csv_file = request.data['train_csv_file']
-        test_csv_file = request.data['test_csv_file']
+        train_file = request.data['train_file']
+        test_file = request.data['test_file']
 
 
         filter = request.data.get('filter') or None
         filter_exclude = request.data.get('filter_exclude') or False
         batch_size = int(request.data.get('batch_size')) or 1
-        save_if_better = request.data.get('save_if_better') or False
+        save_if_better = request.data.get('save_if_better') or not net_model.trained or False
 
 
         train_log = net_model.train(
-            train_csv_file=train_csv_file,
+            train_csv_file=train_file,
             filter=filter,
             filter_exclude=filter_exclude,
             batch_size=batch_size
             )
-
+        
         test_log = net_model.test(
             test_csv_file=test_csv_file,
             filter=filter,
@@ -62,17 +62,17 @@ def trainNet(request, net_model_id=None):
     
     elif net_model.type == "object_detection":
         
-        train_xml_file = request.data['train_xml_file']
+        train_file = request.data['train_file']
         batch_size = request.data.get('batch_size') or 1
         train_log = net_model.train(
             train_file= train_xml_file,
             batch_size= batch_size
             )
         net_model.saveModel()
+        test_log = None
 
-    return Response({"status": "Finished", "train_log": train_log}, status=status.HTTP_200_OK)
+    return Response({"status": "Finished", "train_log": train_log, "test_log": test_log}, status=status.HTTP_200_OK)
 
-    return Response({"status": "Something went wrong."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

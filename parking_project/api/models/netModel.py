@@ -136,7 +136,7 @@ class NetModel(models.Model):
         self.model.to(DEVICE)
         self.model.double()
         train_log = "Start training: \n"
-        for epoch in range(5):  # loop over the dataset multiple times
+        for epoch in range(10):  # loop over the dataset multiple times
 
             for i, data in enumerate(trainloader, 0):
                 images,targets = data[0].to(DEVICE), move_to(data[1],DEVICE) 
@@ -151,8 +151,8 @@ class NetModel(models.Model):
         if self.type == "object_detection":
             pass
 
-        if self.type == "clasification":
-            root_dir='./data/netmodel/'+str(self.id)+'/data/'
+        if self.type == "classification":
+            root_dir='./data/netmodel/model'+str(self.id)+'/data/'
             test_data_loader = PatchesFromCsvDataLoader(
                 csv_file=test_csv_file,
                 root_dir=root_dir,
