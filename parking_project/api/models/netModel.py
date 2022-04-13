@@ -147,14 +147,14 @@ class NetModel(models.Model):
                 images.to(DEVICE_CPU),move_to(targets,DEVICE_CPU)
         return train_log
 
-    def test(self,test_csv_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
+    def test(self,test_file,filter=None,filter_exclude=False, batch_size=1,save_if_better=False):
         if self.type == "object_detection":
             pass
 
         if self.type == "classification":
             root_dir='./data/netmodel/model'+str(self.id)+'/data/'
             test_data_loader = PatchesFromCsvDataLoader(
-                csv_file=test_csv_file,
+                csv_file=test_file,
                 root_dir=root_dir,
                 filter=filter,
                 filter_exclude=filter_exclude,
