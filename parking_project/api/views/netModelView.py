@@ -17,6 +17,14 @@ class NetModelView(APIView):
     authentication_classes = [BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        serializer = NetModelSerializer(NetModel.objects.all(), many=True)
+        data = serializer.data
+        if data:
+            return Response({"status": "Net models found", "data": serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({"status": "No net model"}, status=status.HTTP_400_BAD_REQUEST)
+
     def post(self, request):
         serializer = NetModelSerializer(data=request.data)
         if serializer.is_valid():
