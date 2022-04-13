@@ -31,9 +31,9 @@ class NetModelOneView(APIView):
     permission_classes = [IsAuthenticated]
 
     
-    def get(self, request, netmodel_id=None):
+    def get(self, request, net_model_id=None):
 
-        net_model = NetModel.objects.get(id=netmodel_id)
+        net_model = NetModel.objects.get(id=net_model_id)
         net_model.loadNetModel()
 
         serializer = NetModelSerializer(net_model)
