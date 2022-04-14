@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import authentication_classes,permission_classes
 
-from skimage import io
+from PIL import Image
 
 from ..handlers import imageHandlers, occupancyDetectionHandlers
 from ..models import Camera, NetModel, ParkingLot
@@ -129,7 +129,7 @@ def detectOccupancy(request, parking_lot_id=None):
     if not camera_image:
         return Response({"status": "Error ocured.", "error":"camera_image data required"}, status=status.HTTP_400_BAD_REQUEST)
     
-    camera_image = io.imread(camera_image)
+    camera_image = Image.open(camera_image).convert("RGB")
     
 
     if net_model.type == 'classification':    
