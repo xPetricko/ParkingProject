@@ -133,12 +133,9 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
     
 
     if net_model.type == 'classification':    
-        parking_places, patches = imageHandlers.getPatchesFromImage(camera,camera_image)
-
-        result = occupancyDetectionHandlers.classficationOccupancy(parking_places,patches,net_model)
+        result = occupancyDetectionHandlers.classficationOccupancy(camera,net_model,camera_image)
         
     elif net_model.type == 'object_detection':
-
         result = occupancyDetectionHandlers.objectDetectionOccupancy(camera,net_model,camera_image)
 
     

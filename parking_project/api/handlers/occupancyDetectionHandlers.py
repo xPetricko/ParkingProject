@@ -1,6 +1,8 @@
+from matplotlib.transforms import BboxBase
 import torch
 
 from ..models import Camera,NetModel
+from .imageHandlers import getPatchesFromImage
 
 
 def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersection_threshold=0.6):
@@ -36,22 +38,23 @@ def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersecti
         results.append({
             'parking_space_id': bounding_box.parking_space.id, 
             'pakring_space_number': bounding_box.parking_space.parking_number,
-            'bbox': bounding_box_coordinates,
+            'bounding_box': bounding_box_coordinates,
             'occupied':occupied
             })    
             
     return results
 
 
-            
 
+def classficationOccupancy(camera: Camera,net_model: NetModel, image):
 
+    parking_places, patches, bboxes = getPatchesFromImage(camera,image)
     
-
-
-
-def classficationOccupancy(parking_places, patches, net_model: NetModel):
-
     results = net_model.detectOccupancyClassification(patches)
     
-    return [{ 'parking_space_id':parking_places[index].id, 'parking_space_number':parking_places[index].parking_number, 'result':result} for index,result in enumerate(results)]
+    return [{
+        'parking_space_id': parking_places[index].id,
+        'parking_space_number': parking_places[index].parking_number,
+        "bounding_box": bboxes[index],
+        'occupied':result
+        } for index,result in enumerate(results)]

@@ -8,6 +8,7 @@ def getPatchesFromImage(camera, camera_image):
 
     patches = []
     parking_spaces = []
+    bboxes = []
 
     image_arr = numpy.array(camera_image)
 
@@ -19,5 +20,6 @@ def getPatchesFromImage(camera, camera_image):
             ]
         )
         parking_spaces.append(bounding_box.parking_space)
+        bboxes.append(bounding_box.getCoordinates())
 
-    return parking_spaces,patches
+    return parking_spaces,patches, bboxes
