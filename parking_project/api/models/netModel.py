@@ -271,11 +271,12 @@ class NetModel(models.Model):
             self.loadNetModel()
 
         self.model.to(DEVICE)
-        transformed_patches.to(DEVICE)
+        transformed_patches = transformed_patches.to(DEVICE)
 
 
-        result = self.model(transformed_patches).detach().numpy()
+        result = self.model(transformed_patches)
 
+        result = result.detach().numpy()
         return np.argmax(result, axis=1)
 
 
