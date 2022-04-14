@@ -4,7 +4,7 @@ from ..models import Camera,NetModel
 
 
 def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersection_threshold=0.6):
-    
+    net_model.loadNetModel()
     prediction_result = net_model.detectOccupancyObjectDetection(image)
 
     results = []
