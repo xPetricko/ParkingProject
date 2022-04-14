@@ -22,4 +22,4 @@ def getPatchesFromImage(camera, camera_image):
         parking_spaces.append(bounding_box.parking_space)
         bboxes.append(bounding_box.getCoordinates())
 
-    return parking_spaces,patches, bboxes
+    return parking_spaces, patches, bboxes
