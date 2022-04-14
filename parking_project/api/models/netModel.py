@@ -18,7 +18,7 @@ from parking_project.api.handlers.netModelCreateHandlers import \
 from parking_project.api.utils.dataloaders import (ObjectDetectionDataLoader,
                                                    PatchesFromCsvDataLoader)
 from parking_project.settings import DEVICE, DEVICE_CPU
-from torchvision import transforms
+from torchvision import transforms as T
 
 from ..utils import torchUtils as torch_utils
 
@@ -236,7 +236,7 @@ class NetModel(models.Model):
     def detectOccupancyObjectDetection(self,image):
 
         self.model.to(DEVICE)
-        image = torch.from_numpy(np.stack(image)).to(DEVICE)
+        image = T.ToTensor()(image).to(DEVICE)
 
         prediction = self.model([image])
 
@@ -244,12 +244,12 @@ class NetModel(models.Model):
 
     def detectOccupancyClassification(self,patches):
         
-        transform = transforms.Compose([
-                                transforms.ToPILImage(),
-                                transforms.Resize(256),
-                                transforms.CenterCrop(224),
-                                transforms.ToTensor(),
-                                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transform = T.Compose([
+                                T.ToPILImage(),
+                                T.Resize(256),
+                                T.CenterCrop(224),
+                                T.ToTensor(),
+                                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                             ])
 
         
