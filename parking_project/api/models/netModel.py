@@ -254,14 +254,25 @@ class NetModel(models.Model):
                             ])
 
         
-        transformed_patches = torch.Tensor([transform(x) for x in patches])
+        transformed_patches = []
 
+        for patch in patches:
+            
+            transformed_patches.append(transform(patch))
+
+
+    
+        transformed_patches = np.stack(transformed_patches)
+        transformed_patches_shape = transformed_patches.shape
+
+        transformed_patches = torch.from_numpy(transformed_patches.flatten()).reshape(transformed_patches_shape)
 
         if not self.model:
             self.loadNetModel()
 
         self.model.to(DEVICE)
         transformed_patches.to(DEVICE)
+
 
         result = self.model(transformed_patches).detach().numpy()
 
