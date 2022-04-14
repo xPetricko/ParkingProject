@@ -139,7 +139,7 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
         
     elif net_model.type == 'object_detection':
 
-        result = occupancyDetectionHandlers.objectDetectionOccupancy(camera_image,net_model)
+        result = occupancyDetectionHandlers.objectDetectionOccupancy(camera,net_model,camera_image)
 
     
     
