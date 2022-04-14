@@ -8,7 +8,7 @@ def occupancyLogger(result,request_timestamp):
             SpaceOccupancyHistory(
                 parking_space_id=row['parking_space_id'],
                 timestamp=request_timestamp,
-                occupied=row["result"]
+                occupied=row["occupied"]
             ) for row in result
         ]
     )
