@@ -1,4 +1,3 @@
-from matplotlib.transforms import BboxBase
 import torch
 
 from ..models import Camera,NetModel
