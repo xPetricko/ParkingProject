@@ -15,6 +15,7 @@ def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersecti
         bounding_box_coordinates = bounding_box.getCoordinates()
 
         for prediction_box in prediction_result['boxes']:
+            
             if occupied:
                 break
             
@@ -32,7 +33,12 @@ def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersecti
             if intersection_area/bounding_box.getArea() > intersection_threshold:
                 occupied = True
 
-        results.append({'parking_space_id':bounding_box.parking_space.id, 'pakring_space_number': bounding_box.parking_space.parking_number, 'result':occupied})    
+        results.append({
+            'parking_space_id': bounding_box.parking_space.id, 
+            'pakring_space_number': bounding_box.parking_space.parking_number,
+            'bbox': bounding_box_coordinates,
+            'occupied':occupied
+            })    
             
     return results
 
