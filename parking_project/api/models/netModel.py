@@ -254,14 +254,13 @@ class NetModel(models.Model):
                             ])
 
         
-        transformed_patches = [transform(x) for x in patches]
+        transformed_patches = [transform(x).to(DEVICE) for x in patches]
 
 
         if not self.model:
             self.loadNetModel()
 
         self.model.to(DEVICE)
-        transformed_patches.to(DEVICE)
 
 
         result = self.model(transformed_patches).detach().numpy()
