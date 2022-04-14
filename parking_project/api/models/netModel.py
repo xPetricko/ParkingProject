@@ -235,6 +235,7 @@ class NetModel(models.Model):
 
     def detectOccupancyObjectDetection(self,image):
 
+        self.model.eval()
         self.model.to(DEVICE)
         image = T.ToTensor()(image).to(DEVICE)
 
