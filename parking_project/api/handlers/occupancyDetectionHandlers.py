@@ -9,7 +9,7 @@ def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersecti
 
     results = []
 
-    for bounding_box in camera.boundingbox_set:
+    for bounding_box in camera.boundingbox_set.all():
         occupied = False
 
         bounding_box_coordinates = bounding_box.getCoordinates()
