@@ -261,11 +261,6 @@ class NetModel(models.Model):
             transformed_patches.append(transform(patch))
 
 
-        transformed_patches = np.stack(transformed_patches)
-        patches_shape = transformed_patches.shape
-
-        transformed_patches = torch.from_numpy(transformed_patches.flatten()).reshape(patches_shape)
-
         if not self.model:
             self.loadNetModel()
 
