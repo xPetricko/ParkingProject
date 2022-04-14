@@ -114,12 +114,12 @@ def testNetCsv(request, net_model_id=None):
 @api_view(['POST'])
 @authentication_classes([BasicAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def detectOccupancy(request, parking_lot_id=None):
+def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
 
 
     parking_lot = get_object_or_404(ParkingLot,pk=parking_lot_id)
     camera  = get_object_or_404(parking_lot.camera_set,camera_number=request.data.get('camera_number'))
-    net_model = get_object_or_404(NetModel,pk=request.data.get('net_model_id'))
+    net_model = get_object_or_404(NetModel,pk=net_model_id)
 
     request_timestamp = datetime.datetime.now().astimezone()
 

@@ -17,6 +17,6 @@ urlpatterns = [
     path('netmodel/<int:net_model_id>/upload_data', ParkingLotFilesUploadView.as_view()),
     path('netmodel/<int:net_model_id>/train', ParkingProjectApiFunctions.trainNet),
     path('netmodel/<int:net_model_id>/test/csv', ParkingProjectApiFunctions.testNetCsv),
-    path('parkinglot/<int:parking_lot_id>/detect_occupancy', ParkingProjectApiFunctions.detectOccupancy),
+    path('parkinglot/<int:parking_lot_id>/detect_occupancy/<int:net_model_id>', ParkingProjectApiFunctions.detectOccupancy),
     path('authenticate', AuthenticationView.as_view()),
 ]
