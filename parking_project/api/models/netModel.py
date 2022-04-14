@@ -254,7 +254,7 @@ class NetModel(models.Model):
                             ])
 
         
-        transformed_patches = transform(patches)
+        transformed_patches = [transform(x) for x in patches]
 
 
         if not self.model:
