@@ -277,7 +277,7 @@ class NetModel(models.Model):
         result = self.model(transformed_patches)
 
         result = result.to(DEVICE_CPU).detach().numpy()
-        return np.argmax(result, axis=1)
+        return [bool(x) for x in np.argmax(result, axis=1)]
 
 
 
