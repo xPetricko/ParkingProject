@@ -1,7 +1,5 @@
 import csv
-import json
 from getpass import getpass
-from os import fdopen
 
 import requests
 from requests.auth import HTTPBasicAuth
