@@ -146,7 +146,7 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
         loggers.occupancyLogger(result,request_timestamp)
 
 
-    return Response({"status": "Finished","result":result}, status=status.HTTP_200_OK)
+    return Response({"status": "Finished","result":result, "timestamp": request_timestamp.strftime("%Y-%m-%d %H:%M")}, status=status.HTTP_200_OK)
     
 
 
