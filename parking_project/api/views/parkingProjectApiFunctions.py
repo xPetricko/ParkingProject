@@ -122,7 +122,11 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
     net_model = get_object_or_404(NetModel,pk=net_model_id)
 
     camera_image = request.data.get("camera_image")
-    request_timestamp = request.data.get("timestamp") or datetime.datetime.now().astimezone()
+    
+    if request.data.get("timestamp") :
+        request_timestamp = datetime.datetime.strptime(request.data.get("timestamp"),"%Y-%m-%d %H:%M")
+    else:
+        request_timestamp = datetime.datetime.now().astimezone()
     
     if not camera_image:
         return Response({"status": "Error ocured.", "error":"camera_image data required"}, status=status.HTTP_400_BAD_REQUEST)
