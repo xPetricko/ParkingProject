@@ -1,11 +1,11 @@
 import datetime
-from time import time
+from time import sleep, time
 import requests
 import re
 from requests.auth import HTTPBasicAuth
 import getpass
 import os
-
+import time
 
 print("Working dir is: "+ os.getcwd())
 images_file_path = input("Images paths file: ")
@@ -21,33 +21,47 @@ auth = HTTPBasicAuth(login, password)
 del login,password
 
 images_paths = []
+simulated_timestamp = datetime.datetime.strptime("2021-03-10", "%Y-%m-%d")
+last_timestamp_date = None
 
-with open(images_file_path,"r") as f:
-    images_paths = f.read().splitlines()
+while True:
 
-for image_path in images_paths:
-    timestamp = image_path.split("/")[-1].replace(".jpg","")
-    timestamp = datetime.datetime.strptime(timestamp,"%Y-%m-%d_%H%M").strftime("%Y-%m-%d %H:%M")
+    with open(images_file_path,"r") as f:
+        images_paths = f.read().splitlines()
+
+    for image_path in images_paths:
+        
+
+        timestamp = image_path.split("/")[-1].replace(".jpg","")
+        timestamp = datetime.datetime.strptime(timestamp,"%Y-%m-%d_%H%M").strftime("%Y-%m-%d %H:%M")
+
+        if last_timestamp_date != timestamp.date():
+            last_timestamp_date = timestamp.date()
+            simulated_timestamp+datetime.timedelta(days=1)
+
+        request_timestamp = simulated_timestamp+datetime.timedelta(hours=timestamp.hour,minutes=timestamp.minute)
+
+        while request_timestamp > datetime.datetime.now():
+            sleep(60*15)
+        
+        camera_number = re.findall("camera([1-9])", image_path)[0]
+
+        image_file = open(image_path, "rb")
 
 
-    camera_number = re.findall("camera([1-9])", image_path)[0]
+        request_url = "http://"+server_ip+":8000/api/parkinglot/"+parking_lot_id+"/detect_occupancy/"+net_model_id
 
-    image_file = open(image_path, "rb")
+        data = {"camera_number": camera_number, "timestamp": request_timestamp }
+        files = {"camera_image": image_file}
 
+        response = requests.post(request_url,files=files, data=data, auth=auth)
 
-    request_url = "http://"+server_ip+":8000/api/parkinglot/"+parking_lot_id+"/detect_occupancy/"+net_model_id
-
-    data = {"camera_number": camera_number, "timestamp": timestamp }
-    files = {"camera_image": image_file}
-
-    response = requests.post(request_url,files=files, data=data, auth=auth)
-
-    print(image_path,"-",response.status_code)
-    if response.status_code!=200:
-        break 
+        print("Date: "+request_timestamp.strftime("%Y-%m-%d")+"-"+image_path,"-",response.status_code)
+        if response.status_code!=200:
+            break 
 
 
-    
+        
 
 
 
