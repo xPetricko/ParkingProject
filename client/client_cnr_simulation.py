@@ -37,7 +37,7 @@ while True:
 
         if last_timestamp_date != timestamp.date():
             last_timestamp_date = timestamp.date()
-            simulated_timestamp+datetime.timedelta(days=1)
+            simulated_timestamp = simulated_timestamp+datetime.timedelta(days=1)
 
         request_timestamp = simulated_timestamp+datetime.timedelta(hours=timestamp.hour,minutes=timestamp.minute)
 
