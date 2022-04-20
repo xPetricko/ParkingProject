@@ -21,7 +21,7 @@ auth = HTTPBasicAuth(login, password)
 del login,password
 
 images_paths = []
-simulated_timestamp = datetime.datetime.strptime("2021-03-10", "%Y-%m-%d")
+simulated_timestamp = datetime.datetime.strptime("2022-03-10", "%Y-%m-%d")
 last_timestamp_date = None
 
 while True:
@@ -56,7 +56,7 @@ while True:
 
         response = requests.post(request_url,files=files, data=data, auth=auth)
 
-        print("Date: "+request_timestamp.strftime("%Y-%m-%d")+"-"+image_path,"-",response.status_code)
+        print("Date: "+request_timestamp.strftime("%Y-%m-%d")+" - "+image_path,"-",response.status_code)
         if response.status_code!=200:
             break 
 
