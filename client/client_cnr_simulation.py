@@ -33,7 +33,7 @@ while True:
         
 
         timestamp = image_path.split("/")[-1].replace(".jpg","")
-        timestamp = datetime.datetime.strptime(timestamp,"%Y-%m-%d_%H%M").strftime("%Y-%m-%d %H:%M")
+        timestamp = datetime.datetime.strptime(timestamp,"%Y-%m-%d_%H%M")
 
         if last_timestamp_date != timestamp.date():
             last_timestamp_date = timestamp.date()
@@ -51,7 +51,7 @@ while True:
 
         request_url = "http://"+server_ip+":8000/api/parkinglot/"+parking_lot_id+"/detect_occupancy/"+net_model_id
 
-        data = {"camera_number": camera_number, "timestamp": request_timestamp }
+        data = {"camera_number": camera_number, "timestamp": request_timestamp.strftime("%Y-%m-%d %H:%M") }
         files = {"camera_image": image_file}
 
         response = requests.post(request_url,files=files, data=data, auth=auth)
