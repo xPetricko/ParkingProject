@@ -13,7 +13,7 @@ images_file_path = input("Images paths file: ")
 parking_lot_id = input("Parking lot id: ")
 net_model_id = input("Net model id: ")
 default_camera_number = input("Default camera number (optional): ")
-
+simulation_start_date = input("Simulation start date (YYYY-MM-DD): ") or "2022-03-01"
 server_ip = input("Server IP: ")
 
 login = input("Login: ")
@@ -23,7 +23,7 @@ auth = HTTPBasicAuth(login, password)
 del login,password
 
 images_paths = []
-simulated_timestamp = datetime.datetime.strptime("2022-03-10", "%Y-%m-%d")
+simulated_timestamp = datetime.datetime.strptime(simulation_start_date, "%Y-%m-%d")
 last_timestamp_date = None
 
 while True:
@@ -46,7 +46,7 @@ while True:
         while request_timestamp > datetime.datetime.now():
             sleep(60*15)
         
-        camera_number = (re.findall("camera([1-9])", image_path)+default_camera_number)[0]
+        camera_number = (re.findall("camera([1-9])", image_path)+[default_camera_number])[0]
 
         image_file = open(image_path, "rb")
 
