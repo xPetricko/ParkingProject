@@ -1,5 +1,6 @@
 import datetime
 from time import sleep, time
+from xml.dom.pulldom import default_bufsize
 import requests
 import re
 from requests.auth import HTTPBasicAuth
@@ -11,6 +12,7 @@ print("Working dir is: "+ os.getcwd())
 images_file_path = input("Images paths file: ")
 parking_lot_id = input("Parking lot id: ")
 net_model_id = input("Net model id: ")
+default_camera_number = input("Default camera number (optional): ")
 
 server_ip = input("Server IP: ")
 
@@ -44,7 +46,7 @@ while True:
         while request_timestamp > datetime.datetime.now():
             sleep(60*15)
         
-        camera_number = re.findall("camera([1-9])", image_path)[0]
+        camera_number = (re.findall("camera([1-9])", image_path)+default_camera_number)[0]
 
         image_file = open(image_path, "rb")
 

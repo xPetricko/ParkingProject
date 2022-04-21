@@ -3,12 +3,22 @@ from getpass import getpass
 
 import requests
 from requests.auth import HTTPBasicAuth
-
-X_RATIO = 1000/2592
-Y_RATIO = 750/1944
+import os
 
 
 
+
+selected_dataset = input("Which dataset (custom,cnr):" )
+if selected_dataset not in ("cnr","custom"):
+    print("Selected wrong dataset")
+    exit
+
+
+X_RATIO = 1000/2592 if selected_dataset == "cnr" else 1
+Y_RATIO = 750/1944 if selected_dataset == "cnr" else 1
+
+names = {"cnr":"CNR Test Parking Lot", "custom": "Custom Parking Lot"}
+resolutions = {"cnr":[1000,750], "custom": [1280,720]}
 server_ip = input("Insert server IP: ")
 
 login = input("Login: ")
@@ -27,15 +37,15 @@ res = requests.post(url=server_url+'parkinglot', auth=auth)
 
 
 
-print('Starting script CNR Park Dataset Import')
+print('Starting script Dataset Import')
 print('-'*20)
 
 
 print('Creating Parking Lot')
 headers = {'Content-type':'application/json'}
 data = {
-    'address' : 'Test Address',
-    'name' : 'CNR ParkLot',
+    'address' : 'Test Address '+selected_dataset,
+    'name' : names[selected_dataset],
 }
 res = requests.post(url=server_url+'parkinglot',headers=headers,json=data, auth=auth)
 
@@ -46,14 +56,14 @@ else:
     exit()
 
 parking_lot_data = res.json()['data']
-
+number_of_cameras = len(os.listdir("./data/"+selected_dataset+"/"))
 print('Creating Cameras')
 data = [ {
     'parking_lot': parking_lot_data['id'],
     'camera_number': i,
-    'resolution_x': 1000,
-    'resolution_y':750
-    } for i in range(1,10)
+    'resolution_x': resolutions[selected_dataset][0],
+    'resolution_y': resolutions[selected_dataset][1]
+    } for i in range(1,number_of_cameras+1)
     ]
 
 res = requests.post(url=server_url+'camera',headers=headers,json=data, auth=auth)
@@ -70,8 +80,8 @@ boundingbox_data = []
 parking_spaces_ids = []
 
 print('Preparing Parking Space data')
-for i in range(1,10):
-    with open("./data/camera"+str(i)+".csv","r") as file:
+for i in range(1,number_of_cameras+1):
+    with open("./data/"+selected_dataset+"/camera"+str(i)+".csv","r") as file:
         csvreader = csv.reader(file)        
         header = next(csvreader)
         for row in csvreader:
@@ -133,4 +143,5 @@ else:
     exit 
 
 print('Import completed!')
+print("Parking lot ID:",parking_lot_data['id'])
 print('-'*20)
