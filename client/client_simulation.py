@@ -23,7 +23,7 @@ auth = HTTPBasicAuth(login, password)
 del login,password
 
 images_paths = []
-simulated_timestamp = datetime.datetime.strptime("2022-04-20", "%Y-%m-%d")
+simulated_timestamp = datetime.datetime.strptime(simulation_start_date, "%Y-%m-%d")
 last_timestamp_date = None
 
 while True:
