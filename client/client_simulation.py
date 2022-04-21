@@ -23,7 +23,7 @@ auth = HTTPBasicAuth(login, password)
 del login,password
 
 images_paths = []
-simulated_timestamp = datetime.datetime.strptime(simulation_start_date, "%Y-%m-%d")
+simulated_timestamp = datetime.datetime.strptime("2022-04-20", "%Y-%m-%d")
 last_timestamp_date = None
 
 while True:
@@ -44,6 +44,8 @@ while True:
         request_timestamp = simulated_timestamp+datetime.timedelta(hours=timestamp.hour,minutes=timestamp.minute)
 
         while request_timestamp > datetime.datetime.now():
+            print("Request timestamp:" ,request_timestamp.strftime("%Y-%m-%d %H:%M:%S"))
+            print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),"Time reached, waiting.")
             sleep(60*15)
         
         camera_number = (re.findall("camera([1-9])", image_path)+[default_camera_number])[0]
