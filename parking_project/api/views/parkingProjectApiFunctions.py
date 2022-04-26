@@ -120,7 +120,8 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
     parking_lot = get_object_or_404(ParkingLot,pk=parking_lot_id)
     camera  = get_object_or_404(parking_lot.camera_set,camera_number=request.data.get('camera_number'))
     net_model = get_object_or_404(NetModel,pk=net_model_id)
-
+    
+    skip_logeger = bool(request.data.get("skip_logeger") or False)
     camera_image = request.data.get("camera_image")
     
     if request.data.get("timestamp") :
@@ -142,7 +143,7 @@ def detectOccupancy(request, parking_lot_id=None, net_model_id=None):
 
     
     
-    if result:
+    if result and not skip_logeger:
         loggers.occupancyLogger(result,request_timestamp)
 
 
