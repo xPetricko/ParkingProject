@@ -56,7 +56,7 @@ def request_function(thread_number, images_paths):
                 print("Thread %d - Request failed with status %d" % (thread_number, response.status_code))
             if stop_threads:
                 print("Terminating thread %d." % (thread_number,))
-                return 0
+                sleep(5)
         
 
 
@@ -109,9 +109,11 @@ while True:
                 split_time = time.time()
                 repeat += 1
 
-            
-for thread in threads:
+
+for i,thread in enumerate(threads):
     thread.join()
+    print("Thread %d terminated!" % i)
+
 
 
 save_to_file = ""
