@@ -82,7 +82,7 @@ while True:
         print("Last request/s: %.2f - Actual request/s: %.2f" % (last_request_per_second, actual_request_per_second))
 
         if last_request_per_second < actual_request_per_second or repeat%2:
-            repeat+=1
+            repeat += repeat % 2
             last_request_per_second = actual_request_per_second
             last_request_times = len(request_times)
             split_time = time.time()
