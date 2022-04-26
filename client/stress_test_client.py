@@ -33,7 +33,7 @@ input("Pres enter to start.")
 
 
 def request_function(thread_number, images_paths):
-    global server_ip,parking_lot_id,net_model_id,request_times, threads, stop_threads
+    global server_ip,parking_lot_id,net_model_id,request_times, threads, stop_threads, status_500_counter
     while not stop_threads:
         for image_path in images_paths: 
             camera_number = (re.findall("camera([1-9])", image_path)+[default_camera_number])[0]
@@ -51,6 +51,8 @@ def request_function(thread_number, images_paths):
             if response.status_code==200:
                 request_times.append([time.time(), len(threads), end_request_time-start_request_time])
             else:
+                status_500_counter += 1
+                stop_threads = True
                 print("Thread %d - Request failed with status %d" % (thread_number, response.status_code))
             if stop_threads:
                 print("Terminating thread %d." % (thread_number,))
@@ -61,10 +63,11 @@ def request_function(thread_number, images_paths):
 
 
 
-threshold = 100
+threshold = 20
 last_request_times = 0
 last_request_per_second = 0
 repeat = 0
+status_500_counter = 0
 
 print("Starting thread %d." % len(threads))
 x = threading.Thread(target=request_function, args=(len(threads),images_paths))
@@ -95,7 +98,7 @@ while True:
             
             
         else:
-            if repeat>10:
+            if repeat>10 or status_500_counter > 10:
                 print("No improvement after 10 repeating, terminating.")
                 stop_threads = True
                 break
