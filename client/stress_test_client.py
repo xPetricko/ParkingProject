@@ -102,10 +102,10 @@ while True:
             
             
         
-        if repeat>5 or len(status_500) > 10:
-            print("No improvement after 5 loops, terminating or getting 500")
-            stop_threads = True
-            break
+    if repeat>5 or len(status_500) > 10:
+        print("No improvement after 5 loops, terminating or getting 500")
+        stop_threads = True
+        break
 
 
 threads[0].join()
