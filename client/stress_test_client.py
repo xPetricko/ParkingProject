@@ -52,12 +52,7 @@ def request_function(thread_number, images_paths):
             if response.status_code==200:
                 request_times.append([time.time(), len(threads), end_request_time-start_request_time])
             else:
-<<<<<<< HEAD
-                status_500_counter += 1
-                stop_threads = True
-=======
                 status_500.append(1)
->>>>>>> f0d7853b9093df35a739f0aa511c20c32a84bef9
                 print("Thread %d - Request failed with status %d" % (thread_number, response.status_code))
             if stop_threads:
                 print("Terminating thread %d." % (thread_number,))
