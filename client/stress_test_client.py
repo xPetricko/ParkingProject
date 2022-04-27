@@ -24,6 +24,7 @@ images_paths = list()
 request_times = list()
 threads = list()
 stop_threads = False
+status_500 = list()
 
 with open(images_file_path,"r") as f:
     images_paths = f.read().splitlines()
@@ -33,7 +34,7 @@ input("Pres enter to start.")
 
 
 def request_function(thread_number, images_paths):
-    global server_ip,parking_lot_id,net_model_id,request_times, threads, stop_threads, status_500_counter
+    global server_ip,parking_lot_id,net_model_id,request_times, threads, stop_threads, status_500
     while not stop_threads:
         for image_path in images_paths: 
             camera_number = (re.findall("camera([1-9])", image_path)+[default_camera_number])[0]
@@ -51,7 +52,7 @@ def request_function(thread_number, images_paths):
             if response.status_code==200:
                 request_times.append([time.time(), len(threads), end_request_time-start_request_time])
             else:
-                status_500_counter += 1
+                status_500.append(1)
                 print("Thread %d - Request failed with status %d" % (thread_number, response.status_code))
             if stop_threads:
                 print("Terminating thread %d." % (thread_number,))
@@ -67,7 +68,7 @@ threshold = 20
 last_request_times = 0
 last_request_per_second = 0
 repeat = 0
-status_500_counter = 0
+
 
 print("Starting thread %d." % len(threads))
 x = threading.Thread(target=request_function, args=(len(threads),images_paths))
@@ -84,37 +85,31 @@ while True:
         print("Checking improvement.")
         print("Last request/s: %.2f - Actual request/s: %.2f" % (last_request_per_second, actual_request_per_second))
 
-        if last_request_per_second < actual_request_per_second or repeat%2:
-            repeat += repeat % 2
+        if last_request_per_second < actual_request_per_second:
+            print("Improved!")
             last_request_per_second = actual_request_per_second
-            last_request_times = len(request_times)
-            split_time = time.time()
-            
-
-            print("Starting thread %d." % len(threads))
-            x = threading.Thread(target=request_function, args=(len(threads),images_paths))
-            threads.append(x)
-            x.start()
-            
-            
         else:
-            if repeat>10 or status_500_counter > 10:
-                print("No improvement after 10 repeating, terminating.")
-                stop_threads = True
-                break
-            else:
-                print("No improvement, repeating one more time.")
-                last_request_per_second = actual_request_per_second
-                last_request_times = len(request_times)
-                split_time = time.time()
-                repeat += 1
+            print("Not mproved!")
+            repeat += 1
+
+        last_request_times = len(request_times)
+        split_time = time.time()
+
+        print("Starting thread %d." % len(threads))
+        x = threading.Thread(target=request_function, args=(len(threads),images_paths))
+        threads.append(x)
+        x.start()
+            
+            
+        
+        if repeat>5 or len(status_500) > 10:
+            print("No improvement after 5 loops, terminating or getting 500")
+            stop_threads = True
+            break
 
 
-for i,thread in enumerate(threads):
-    thread.join()
-    print("Thread %d terminated!" % i)
-
-
+threads[0].join()
+print("Threads terminated!")
 
 save_to_file = ""
 while save_to_file != "n" and save_to_file!= "y":
