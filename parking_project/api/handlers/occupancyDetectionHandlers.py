@@ -36,7 +36,7 @@ def objectDetectionOccupancy(camera: Camera,net_model: NetModel,image,intersecti
 
         results.append({
             'parking_space_id': bounding_box.parking_space.id, 
-            'pakring_space_number': bounding_box.parking_space.parking_number,
+            'parking_space_number': bounding_box.parking_space.parking_number,
             'bounding_box': bounding_box_coordinates,
             'occupied':occupied
             })    
